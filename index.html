@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPC Campaign Management Bot</title>
+    <!-- Chakra UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@chakra-ui/core@1.6.10/dist/chakra-ui.min.css">
+</head>
+<body>
+    <header>
+        <h1>PPC Campaign Management Bot</h1>
+    </header>
+    <main>
+        <section id="login">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input class="chakra-input" type="email" id="email" placeholder="Enter your email" autocomplete="username" required>
+                <input class="chakra-input" type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+                <button class="chakra-button" type="submit">Login</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </section>
+        <section id="campaign-management">
+            <h2>Campaign Management</h2>
+            <form id="campaignForm">
+                <input class="chakra-input" type="text" id="campaignName" placeholder="Campaign Name" required>
+                <input class="chakra-input" type="number" id="budget" placeholder="Budget" required>
+                <select class="chakra-select" id="platform">
+                    <option value="amazon">Amazon</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google Ads</option>
+                </select>
+                <button class="chakra-button" type="button" id="createCampaign">Create Campaign</button>
+                <button class="chakra-button" type="button" id="startCampaign">Start Campaign</button>
+                <button class="chakra-button" type="button" id="stopCampaign">Stop Campaign</button>
+                <div id="campaignCreationSuccess" class="success-message"></div>
+            </form>
+        </section>
+        <section id="optimization-settings">
+            <h2>Optimization Settings</h2>
+            <form id="optimizationForm">
+                <input class="chakra-input" type="number" id="targetCPC" placeholder="Target CPC" step="0.01" required>
+                <input class="chakra-input" type="number" id="targetCPM" placeholder="Target CPM" step="0.01" required>
+                <input class="chakra-input" type="number" id="targetROAS" placeholder="Target ROAS" step="0.01" required>
+                <button class="chakra-button" type="submit">Save Settings</button>
+            </form>
+        </section>
+        <section id="results-display">
+            <h2>Results</h2>
+            <div id="resultsContainer" class="chakra-container">
+                <!-- Results will be dynamically inserted here -->
+            </div>
+        </section>
+        <!-- Instructional Content Section -->
+        <section id="instructional-content">
+            <h2>Advertising Best Practices</h2>
+            <article id="cpm-guide">
+                <h3>CPM (Cost Per Mille)</h3>
+                <p>CPM is the cost per thousand ad impressions. It's best used for brand awareness campaigns where the goal is to maximize exposure.</p>
+            </article>
+            <article id="cpc-guide">
+                <h3>CPC (Cost Per Click)</h3>
+                <p>CPC is the amount you pay each time a user clicks on your ad. It's crucial to optimize ad copy and landing pages to achieve a lower CPC and higher conversion rate.</p>
+            </article>
+            <article id="roas-guide">
+                <h3>ROAS (Return On Ad Spend)</h3>
+                <p>ROAS measures the revenue generated for every dollar spent on advertising. A successful campaign should aim for a ROAS that reflects a profitable margin.</p>
+            </article>
+        </section>
+        <!-- FAQ Section -->
+        <section id="faq">
+            <h2>FAQ</h2>
+            <div id="faqContainer" class="chakra-container">
+                <!-- FAQ content will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 PPC Campaign Management Bot</p>
+    </footer>
+    <!-- Linking the main JavaScript file -->
+    <script src="main.js"></script>
+    <!-- Include the Marked library for Markdown to HTML conversion -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Ensure the DOM is fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Fetch the FAQ content from the markdown file and insert it into the FAQ container
+            fetch('/faq_content.md')
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById('faqContainer').innerHTML = marked.parse(text);
+                })
+                .catch(error => console.error('Error loading FAQ content:', error));
+        });
+    </script>
+</body>
+</html>
