@@ -104,6 +104,35 @@ function handleOptimizationForm(event) {
     });
 }
 
+// Function to handle the feedback form submission
+function handleFeedbackForm(event) {
+    event.preventDefault();
+    // Retrieve feedback message from form
+    const feedbackMessage = document.getElementById('feedbackMessage').value;
+    // AJAX call to backend for submitting feedback
+    fetch('http://127.0.0.1:5000/api/feedback', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ feedbackMessage })
+    })
+    .then(data => {
+        console.log('Feedback submitted:', data);
+        // Handle feedback submission success, update UI with success message
+        document.getElementById('feedbackSuccess').textContent = 'Thank you for your feedback!';
+        document.getElementById('feedbackError').textContent = ''; // Clear any previous error message
+        // Clear the feedback form
+        document.getElementById('feedbackForm').reset();
+    })
+    .catch(error => {
+        console.error('Feedback submission failed:', error);
+        // Handle feedback submission failure, show error message to user
+        document.getElementById('feedbackSuccess').textContent = ''; // Clear any previous success message
+        document.getElementById('feedbackError').textContent = 'Failed to submit feedback. Please try again.';
+    });
+}
+
 // Function to log user actions
 function logUserAction(action, status) {
     // Log the user action to the backend for monitoring
@@ -124,7 +153,10 @@ function logUserAction(action, status) {
     });
 }
 
-// Event listeners for form submissions
+// Event listener for the feedback form submission
+document.getElementById('feedbackForm').addEventListener('submit', handleFeedbackForm);
+
+// Existing event listeners for form submissions
 document.getElementById('loginForm').addEventListener('submit', handleLogin);
 document.getElementById('campaignForm').addEventListener('submit', handleCampaignForm);
 document.getElementById('optimizationForm').addEventListener('submit', handleOptimizationForm);
