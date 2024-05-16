@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import logging
 
@@ -248,6 +248,20 @@ def log_user_action():
     logging.info(f"User action logged: {action}, Status: {status}, Timestamp: {timestamp}")
 
     return jsonify({'message': 'User action logged successfully'}), 200
+
+@app.route('/api/feedback', methods=['POST'])
+def receive_feedback():
+    data = request.json
+    feedback_message = data.get('feedbackMessage')
+
+    # Log the feedback message with detailed information
+    logging.info(f"Feedback received: {feedback_message}")
+
+    return jsonify({'message': 'Feedback received successfully'}), 200
+
+@app.route('/faq_content.md')
+def faq_content():
+    return send_from_directory('.', 'faq_content.md')
 
 if __name__ == '__main__':
     app.run(debug=True)
