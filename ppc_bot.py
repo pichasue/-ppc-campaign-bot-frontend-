@@ -1,9 +1,10 @@
 import requests
 import json
 import time
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 import logging
+import sqlite3
 
 # Configure logging
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
@@ -249,20 +250,33 @@ def log_user_action():
 
     return jsonify({'message': 'User action logged successfully'}), 200
 
-feedback_counter = 0  # Initialize a counter for successful feedback submissions
-
 @app.route('/api/feedback', methods=['POST'])
 def receive_feedback():
-    global feedback_counter
-    data = request.json
-    feedback_message = data.get('feedbackMessage')
+    # Access form data
+    feedback_name = request.form['name']
+    feedback_email = request.form['email']
+    feedback_message = request.form['feedback']
 
-    # Increment the feedback counter
-    feedback_counter += 1
+    # Removed user_id as it's not provided by the form and updated the database insertion query
+    try:
+        # Establish a new database connection for each request
+        with sqlite3.connect('ppc_bot.db') as conn:
+            c = conn.cursor()
+            # Insert the feedback into the database
+            c.execute("INSERT INTO feedback (name, email, message, timestamp) VALUES (?, ?, ?, CURRENT_TIMESTAMP)", (feedback_name, feedback_email, feedback_message))
+            # Commit the changes
+            conn.commit()
+    except sqlite3.Error as e:
+        # Log the exception and return an error response
+        logging.error(f"Database error: {e}")
+        return jsonify({'error': 'Failed to submit feedback'}), 500
+    finally:
+        # Ensure the connection is closed
+        if conn:
+            conn.close()
 
     # Log the feedback message with detailed information
     logging.info(f"Feedback received: {feedback_message}")
-    logging.info(f"Total feedback received: {feedback_counter}")
 
     return jsonify({'message': 'Feedback received successfully'}), 200
 
@@ -270,5 +284,15 @@ def receive_feedback():
 def faq_content():
     return send_from_directory('.', 'faq_content.md')
 
+@app.route('/feedback')
+def feedback():
+    return render_template('feedback.html')
+
+@app.route('/dashboard')
+def dashboard():
+    logging.info('Dashboard route accessed')
+    # Render the dashboard template with the necessary data
+    return render_template('dashboard.html')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=5000)
