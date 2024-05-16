@@ -37,13 +37,15 @@ def create_figure(metric, df):
         plt.close()
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+        # Log the base64 image string for debugging
+        logging.debug(f"Base64 image string for {metric}: {plot_url}")
         return plot_url
     else:
         # Log an error if 'timestamp' column is missing
         logging.error(f"'timestamp' column not found in dataframe for metric {metric}")
         return None
 
-@app.route('/')
+@app.route('/dashboard')
 def dashboard():
     try:
         logging.info('Dashboard function called')
