@@ -249,13 +249,20 @@ def log_user_action():
 
     return jsonify({'message': 'User action logged successfully'}), 200
 
+feedback_counter = 0  # Initialize a counter for successful feedback submissions
+
 @app.route('/api/feedback', methods=['POST'])
 def receive_feedback():
+    global feedback_counter
     data = request.json
     feedback_message = data.get('feedbackMessage')
 
+    # Increment the feedback counter
+    feedback_counter += 1
+
     # Log the feedback message with detailed information
     logging.info(f"Feedback received: {feedback_message}")
+    logging.info(f"Total feedback received: {feedback_counter}")
 
     return jsonify({'message': 'Feedback received successfully'}), 200
 
