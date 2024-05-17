@@ -5,9 +5,10 @@ import sqlite3
 from io import BytesIO
 import base64
 import logging
+import os
 
 app = Flask(__name__)
-app.debug = True  # Enable debug mode
+app.debug = False  # Disable debug mode for production
 
 # Configure logging
 logging.basicConfig(filename='dashboard.log', level=logging.DEBUG, format='%(asctime)s:%(levelname)s:%(message)s')
@@ -22,10 +23,13 @@ def create_figure(metric, df):
     if 'timestamp' in df.columns:
         # Make a copy of the dataframe to preserve the original
         df_copy = df.copy()
+        logging.debug(f"Dataframe copy created for {metric}")
         # Convert 'timestamp' to datetime and set as index in the copy
         df_copy['timestamp'] = pd.to_datetime(df_copy['timestamp'])
+        logging.debug(f"'timestamp' column converted to datetime for {metric}")
         df_copy.set_index('timestamp', inplace=True)
         df_copy[metric].plot(kind='bar')
+        logging.debug(f"Bar plot created for {metric}")
         plt.title(f'{metric} over Time')
         plt.xlabel('Time')
         plt.ylabel(metric)
@@ -39,6 +43,18 @@ def create_figure(metric, df):
         plot_url = base64.b64encode(img.getvalue()).decode('utf8')
         # Log the base64 image string for debugging
         logging.debug(f"Base64 image string for {metric}: {plot_url}")
+        # Write the base64 image string to a file for debugging
+        base64_filepath = os.path.join(os.getcwd(), f"{metric}_plot_base64.txt")
+        try:
+            with open(base64_filepath, "w") as file:
+                file.write(plot_url)
+            logging.info(f"Base64 string for {metric} written to {base64_filepath}")
+        except Exception as e:
+            logging.error(f"Failed to write base64 string for {metric} to file: {e}")
+        # Log the full file path for debugging
+        logging.debug(f"Full file path for {metric} base64 file: {base64_filepath}")
+        # Additional logging to capture the current working directory
+        logging.debug(f"Current working directory: {os.getcwd()}")
         return plot_url
     else:
         # Log an error if 'timestamp' column is missing
@@ -78,4 +94,4 @@ def dashboard():
         raise
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5000)
